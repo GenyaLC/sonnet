@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  sonnet:
+    build:
+      context: app
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    hostname: sonnet
+    env_file:
+      - .env
+    volumes:
+      - ./app:/app
