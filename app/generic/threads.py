@@ -9,6 +9,9 @@ def run_threaded(funcion: Callable, *args, **kwargs):
     args: contains the arguments to be passed to the function: url1, url2, url3, ...\n
     kwargs: contains the keyword arguments to be passed to the function: cookies=cookies, headers=headers, ...
     '''
+    if len(args) == 0:
+        logging.warning("run_threaded func not properly used")
+        return None
     with ThreadPoolExecutor(max_workers=len(args)) as executor:
         futures = {executor.submit(funcion, i, kwargs): i for i in args}
         results = set()

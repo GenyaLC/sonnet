@@ -11,3 +11,5 @@ services:
       - .env
     volumes:
       - ./app:/app
+    environment:
+      TESTING_URL: ${TESTING_URL}
