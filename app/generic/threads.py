@@ -1,34 +1,29 @@
-from concurrent.futures.thread import ThreadPoolExecutor
-from concurrent. futures import as_completed
+import concurrent.futures
 from typing import Callable
-import logging
-
-def run_threaded(funcion: Callable, *args, **kwargs):
-    '''
-    funcion: is the function to be executed\n
-    args: contains the arguments to be passed to the function: url1, url2, url3, ...\n
-    kwargs: contains the keyword arguments to be passed to the function: cookies=cookies, headers=headers, ...
-    '''
-    if len(args) == 0:
-        logging.warning("run_threaded func not properly used")
-        return None
-    with ThreadPoolExecutor(max_workers=len(args)) as executor:
-        futures = {executor.submit(funcion, i, kwargs): i for i in args}
-        results = set()
-        for future in as_completed(futures):
-            try:
-                result = set()
-                result.update(future.result())
-            except Exception as e:
-                print(f"Thread {futures[future]} generated an exception: {e}")
-            else:
-                results.update(result)
-
-        return results
 
 
-def _test_f(num: int, dic: dict):
-    return f"{num} {dic.items()}"
+def run_threaded(func: Callable, iterator, *args):
+    """
+    Ejecuta la función `func` en paralelo usando hilos para cada elemento de `lista`,
+    pasando los parámetros `args` adicionales a cada llamada.
 
-def _test():
-    logging.debug(run_threaded(_test_f, 1, 2, 3, 4, hola="buenos dias", adios="buenas noches"))
+    Parámetros:
+    - func: La función que se ejecutará en cada hilo.
+    - iterator: Una lista cuyos elementos se usarán para crear un hilo por cada uno.
+    - *args: Parámetros adicionales que se pasarán a la función `func`.
+
+    Retorna:
+    - Una lista con los resultados concatenados de cada hilo.
+    """
+    def wrapper(item):
+        return func(
+            item, *args
+        )  # Llama a la función con el item de la lista y los argumentos adicionales
+
+    # Crear un ThreadPoolExecutor para manejar los hilos
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Ejecutar la función en paralelo, creando un hilo por cada elemento de la lista
+        resultados = list(executor.map(wrapper, iterator))
+
+    # Concatenar los resultados y devolverlos
+    return "".join(map(str, resultados))
