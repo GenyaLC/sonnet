@@ -17,7 +17,8 @@ def run_threaded(funcion: Callable, *args, **kwargs):
         results = set()
         for future in as_completed(futures):
             try:
-                result = future.result()
+                result = set()
+                result.update(future.result())
             except Exception as e:
                 print(f"Thread {futures[future]} generated an exception: {e}")
             else:
